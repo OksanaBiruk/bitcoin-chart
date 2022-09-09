@@ -16,10 +16,8 @@ class ImportDataCSV(ImportData):
     def get_data(self, start_time, end_time):
         csv_data = pd.read_csv(self.source_csv).to_json(orient="records")
         data_list = json.loads(csv_data)
-        filter_data = []
-        for data in data_list:
-            if start_time < self.string_to_timestemp(data['Date']) < end_time:
-                filter_data.append(data)
+        filter_data = [data for data in data_list if start_time < self.string_to_timestamp(data['Date']) < end_time]
+
         candle_list = []
         for candle_source in filter_data:
             candle = Candle(
@@ -34,7 +32,7 @@ class ImportDataCSV(ImportData):
         return candle_list
 
     @staticmethod
-    def string_to_timestemp(datestr):
+    def string_to_timestamp(datestr):
         tmstamp = datetime.strptime(datestr, '%b %d, %Y').timestamp() * 1000
         return tmstamp
 
